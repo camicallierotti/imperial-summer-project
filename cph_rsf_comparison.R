@@ -1,5 +1,6 @@
 ### packages
 
+library(xtable)
 library(tidyverse)
 library(dplyr)
 library(pec)
@@ -25,9 +26,9 @@ pbc_test <- pbc %>%
 
 # fit and predict cox
 
-cox.fit = coxph(Surv(days, status) ~ ., data = pbc_train, x = TRUE)
+cox.fit = coxph(Surv(days, status) ~ ., data = pbc_train, x = TRUE, y = TRUE)
 summary(cox.fit)
-write.table(format(coef(cox.fit), scientific=TRUE))
+cox.coef <- (format(coef(cox.fit), scientific=TRUE))
 cox.pred <- predictSurvProb(cox.fit, newdata = pbc_test, times = 10 * 365.25) # predicted 10 year survival probabilities for individuals in test set (n=56)
 
 # fit and predict RSF
@@ -55,16 +56,26 @@ lapply(c(20,46,43), function(x) {
 
 # predicted survival curves for 3 individuals
 
-par(mfrow = c(1, 3))
+m <- matrix(c(1,2,3,4,4,4),nrow = 2,ncol = 3,byrow = TRUE)
+layout(mat = m,heights = c(0.4,0.2))
 
 lapply(c(20,46,43), function(x) {
-  plotPredictSurvProb(cox.fit, newdata = pbc_test[x, ], lty = 1) 
-  plotPredictSurvProb(rsf.fit, newdata = pbc_test[x, ], add = TRUE, lty = 2) 
+  plotPredictSurvProb(cox.fit, newdata = pbc_test[x, ], lty = 1, legend = TRUE, percent = TRUE) 
+  plotPredictSurvProb(rsf.fit, newdata = pbc_test[x, ], add = TRUE, lty = 2, legend = TRUE, percent = TRUE)
 }) # predicted survival curves with Cox for 3 test individuals of different ages
 
-### compare cox and rsf vimp
+plot(1, type = "n", axes=FALSE, xlab="", ylab="")
+legend(x = "bottom",inset = 0,
+       legend = c("Cox regression", "RSF"), lty=1:2, lwd=1, cex=1, horiz = TRUE)
 
-# penalised cox variable selection 
+# concordance index
+
+concordance(cox.fit, newdata = pbc_test) # concordance function cannot be applied to rsf
+rsf.pred <- predict(rsf.fit, newdata = pbc_test, importance = 'permute', cse = TRUE) # can also make predictions for RSF using predict.rfsrc from randomForestSRC package
+
+### compare lasso cox and rsf vimp
+
+# lasso cox variable selection 
 
 x <- as.matrix(pbc[3:ncol(pbc)])
 y <- Surv(pbc$days, pbc$status)
@@ -73,20 +84,24 @@ lasso.fit <- glmnet(x, y, family="cox", alpha=1)
 plot(lasso.fit, label=T)
 
 lasso.cv <- cv.glmnet(x, y, family="cox", alpha=1)
-lasso.cv$lambda.1se # lambda = 0.1343436
+lasso.cv$lambda.1se
 plot(lasso.cv)
 
-coef(lasso.fit, s = "lambda.1se")
+lasso.coef <- format(as.matrix(coef(lasso.fit, s = lasso.cv$lambda.1se)), scientific=TRUE)
+cox.coef.table <- cbind(cox.coef, lasso.coef)
+xtable(cox.coef.table, type = "latex")
 
 # cox vimp
 
-cox.vimp <- anova(full.cox)
+cox.vimp <- anova(cox.fit)
 plot(cox.vimp,
-     what="proportion R2", #proportion of overall model R2 that is due to each predictor
+     what="proportion R2", # proportion of overall model R2 that is due to each predictor
      xlab=NULL, pch=16,
      rm.totals=TRUE, rm.ia=FALSE, rm.other=NULL,
      sort="descending", margin='P',
      pl=TRUE, trans=NULL, ntrans=40, height=NULL, width=NULL)
+
+plot(anova(cox.fit))
 
 # alternative cox vimp
 
@@ -107,23 +122,14 @@ plot(rsf_vimp)
 
 ### compare cox and rsf bootstrap c-index estimates 
 
-# cox 1
-
-foo = function(Data, ind){
-  fit = coxph(Surv(days, status) ~ treatment, data = pbc[ind,])
-  DescTools::Cstat(fit)
-}
-
-set.seed(1998)
-myBootstrap = boot(pbc, foo, R=999)
-
-# cox 2
+# cox
 
 n = length(pbc$status)
 B = 999
 result = rep(NA, B)
 for (i in 1:B) {
   boot.sample = sample(n, replace = TRUE)
-  fit = coxph(Surv(days, status) ~ treatment, data = pbc)
-  result[i] = DescTools::Cstat(fit)
+  fit = coxph(Surv(days, status) ~ treatment, data = pbc_train)
+  pred = predictSurvProb(cox.fit, newdata = pbc_test, times = 10 * 365.25) # predict 0/1 or probabilities?
+  result[i] = DescTools::Cstat(pred, pbc_test$status) # resp argument must be 0/1
 }

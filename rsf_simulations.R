@@ -5,6 +5,7 @@
 library(coxed)
 library(dplyr)
 library(randomForestSRC)
+library(survival)
 library(pec)
 
 # generate data
@@ -40,6 +41,15 @@ rsf.pred <- lapply(c(1,2,3,4,5), function(x) {
 
 # get concordance index
 
-cindex(rsf.pred[[1]], cens_test[[1]]$y)
+lapply(c(1,2,3,4,5), function(x) {
+  attach(cens_test[[x]])
+  surv <- Surv(y, failed)
+})
 
+cindex <- lapply(c(1,2,3,4,5), function(x) {
+  survConcordance(surv[[x]] ~ rsf.pred[[x]])
+})
 
+# plot survival functions for all censoring rates
+
+plotPredictSurvProb(rsf.fit[[1]], newdata = cens_test[[1]], lty = 1, legend = TRUE, percent = TRUE) 

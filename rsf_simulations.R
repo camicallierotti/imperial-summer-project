@@ -5,10 +5,11 @@
 library(coxed)
 library(dplyr)
 library(randomForestSRC)
+library(pec)
 
 # generate data
 
-cens <- lapply(c(.01,.25,.50,.75,1), function(x) {
+cens <- lapply(c(.01,.25,.50,.75,.99), function(x) {
   sim.survdata(N=1000, T=100, xvars=1, censor=x, num.data.frames = 1) 
 }) # data stored in : cens[[x]]$data
 
@@ -32,12 +33,13 @@ rsf.fit <- lapply(c(1,2,3,4,5), function(x){
   rfsrc(Surv(y, failed) ~ X, cens_train[[x]])
 })
 
-print(rsf.fit)
 rsf.pred <- lapply(c(1,2,3,4,5), function(x) {
   # predicted 10 year survival probabilities for individuals in test set
   predictSurvProb(rsf.fit[[x]], newdata = cens_test[[x]], times = 10 * 365.25)
 })
 
+# get concordance index
 
+cindex(rsf.pred[[1]], cens_test[[1]]$y)
 
 

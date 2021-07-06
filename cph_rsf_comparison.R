@@ -9,6 +9,7 @@ library(glmnet)
 library(vimp)
 library(randomForestSRC)
 library(ggRandomForests)
+library(coxed)
 library(boot)
 
 ### data
@@ -120,7 +121,7 @@ print(vimp(iris.obj, joint = TRUE)$importance) # Joint permutation vimp
 rsf_vimp <- gg_vimp(rsf.fit)
 plot(rsf_vimp)
 
-### compare cox and rsf bootstrap c-index estimates 
+### compare cox and rsf bootstrap c-index estimates (not finished)
 
 # cox
 

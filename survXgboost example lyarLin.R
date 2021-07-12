@@ -1,3 +1,5 @@
+### example 1
+
 pacman::p_load_gh("IyarLin/survXgboost")
 pacman::p_load("survival")
 pacman::p_load("xgboost")
@@ -32,4 +34,15 @@ matplot(times, t(survival_curves[1:5, ]), type = "l")
 risk_scores <- predict(object = surv_xgboost_model, newdata = x_train, type = "risk")
 hist(risk_scores)
 
-### source: https://github.com/IyarLin/survXgboost
+# source: https://github.com/IyarLin/survXgboost
+
+### example 2
+
+data(agaricus.train, package='xgboost')
+train <- agaricus.train
+dtrain <- xgb.DMatrix(train$data, label=train$label)
+xgb.DMatrix.save(dtrain, 'xgb.DMatrix.data')
+dtrain <- xgb.DMatrix('xgb.DMatrix.data')
+if (file.exists('xgb.DMatrix.data')) file.remove('xgb.DMatrix.data')
+
+# source: https://www.rdocumentation.org/packages/xgboost/versions/1.4.1.1/topics/xgb.DMatrix

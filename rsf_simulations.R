@@ -36,7 +36,7 @@ rsf.fit <- lapply(c(1,2,3,4,5), function(x){
 
 rsf.pred <- lapply(c(1,2,3,4,5), function(x) {
   # predicted 10 year survival probabilities for individuals in test set
-  predictSurvProb(rsf.fit[[x]], newdata = cens_test[[x]], times = 10 * 365.25)
+  (predictSurvProb(rsf.fit[[x]], newdata = cens_test[[x]], times = 10 * 365.25))*100
 })
 
 # get concordance index
@@ -47,9 +47,9 @@ lapply(c(1,2,3,4,5), function(x) {
 })
 
 cindex <- lapply(c(1,2,3,4,5), function(x) {
-  survConcordance(surv[[x]] ~ rsf.pred[[x]])
-})
+  survConcordance(surv[[x]] ~ rsf.pred[[x]]) 
+}) # 99% censoring rate gives NA cindex?
 
-# plot survival functions for all censoring rates
+# plot survival functions for all censoring rates (choose individuals?)
 
 plotPredictSurvProb(rsf.fit[[1]], newdata = cens_test[[1]], lty = 1, legend = TRUE, percent = TRUE) 

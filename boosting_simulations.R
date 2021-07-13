@@ -38,15 +38,36 @@ xgb.fit <- lapply(c(1,2,3,4,5), function(x){
   # create predictors (X)
   X <- cens_train[[x]] %>% select(-y,-failed)
   # set parameters
-  params <- list(objective = "survival:cox", # what type of dependent variable we have
+  params <- list(objective = "survival:cox", # type of dependent variable
                  eval_metric = "cox-nloglik" # evaluation metric for survival problems
   )
   # run xgboost
   model <- xgboost(data = as.matrix(X), # xgboost library requires data as matrix
                    label = y,
                    params = params,
-                   nrounds = 20, # number of times we want xgboost to run
-                   verbose = 1
+                   nrounds = 20, # number of times xgboost runs
+                   verbose = 1,
   )
 })
 
+# predict on test set
+
+xgb.pred <- lapply(c(1,2,3,4,5), function(x) {
+  # create predictors (X)
+  X <- cens_test[[x]] %>% select(-y,-failed)
+  # model
+  model <- xgb.fit[[x]]
+  # predict
+  pred <- predict(model, as.matrix(X))
+})
+
+# c-index
+
+surv <- lapply(c(1,2,3,4,5), function(x) {
+  attach(cens_test[[x]])
+  Surv(y, failed)
+})
+
+cindex <- lapply(c(1,2,3,4,5), function(x) {
+  survConcordance(surv[[x]] ~ xgb.pred[[x]]) 
+})

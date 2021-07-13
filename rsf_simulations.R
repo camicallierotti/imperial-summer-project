@@ -41,15 +41,25 @@ rsf.pred <- lapply(c(1,2,3,4,5), function(x) {
 
 # get concordance index
 
-lapply(c(1,2,3,4,5), function(x) {
+surv <- lapply(c(1,2,3,4,5), function(x) {
   attach(cens_test[[x]])
-  surv <- Surv(y, failed)
+  Surv(y, failed)
 })
 
 cindex <- lapply(c(1,2,3,4,5), function(x) {
   survConcordance(surv[[x]] ~ rsf.pred[[x]]) 
-}) # 99% censoring rate gives NA cindex?
+})
 
-# plot survival functions for all censoring rates (choose individuals?)
+# plot predicted survival curves for individual with covariate x=0 using 5 RSFs
 
-plotPredictSurvProb(rsf.fit[[1]], newdata = cens_test[[1]], lty = 1, legend = TRUE, percent = TRUE) 
+newData <- data.frame(X=0, y=100, failed=FALSE)
+
+plotPredictSurvProb(x = rsf.fit[[1]],
+                    newdata = newData,
+                    times = 100,
+                    lty = 1,
+                    legend = TRUE,
+                    percent = TRUE
+                    ) # this method needs to select an individual to predict for
+
+

@@ -1,5 +1,5 @@
-1;400;2;D-penicillmain;58,7652293;female;yes;yes;yes;edema;14,5;261;2,6;156;1718;137,95;172;190;12,2;IV
-2;4500;0;D-penicillmain;56,44626968;female;no;yes;yes;no;1,1;302;4,14;54;7394,8;113,52;88;221;10,6;III
+1;400;2;D-penicillmain;"58,7652293";female;yes;yes;yes;edema;"14,5";261;"2,6";156;1718;"137,95";172;190;"12,2";IV
+2;4500;0;D-penicillmain;"56,44626968";female;no;yes;yes;no;1,1;302;4,14;54;7394,8;113,52;88;221;10,6;III
 3;1012;2;D-penicillmain;70,07255305;male;no;no;no;untreated;1,4;176;3,48;210;516;96,1;55;151;12;IV
 4;1925;2;D-penicillmain;54,74058864;female;no;yes;yes;untreated;1,8;244;2,54;64;6121,8;60,63;92;183;10,3;IV
 5;1504;1;Placebo;38,10540726;female;no;yes;yes;no;3,4;279;3,53;143;671;113,15;72;136;10,9;III

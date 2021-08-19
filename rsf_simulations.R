@@ -42,8 +42,7 @@ rsf.pred <- lapply(c(1,2,3,4,5), function(x) {
 # get concordance index
 
 surv <- lapply(c(1,2,3,4,5), function(x) {
-  attach(cens_test[[x]])
-  Surv(y, failed)
+  Surv(cens_test[[x]]$y, cens_test[[x]]$failed)
 })
 
 cindex <- lapply(c(1,2,3,4,5), function(x) {

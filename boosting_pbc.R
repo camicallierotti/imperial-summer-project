@@ -39,3 +39,11 @@ model <- xgboost(data = as.matrix(X), # xgboost library requires data as matrix
 xgb.plot.shap(data = as.matrix(X),
               model = model,
               top_n = 5)
+
+# make predictions
+
+pred <- predict(model, as.matrix(X))
+
+# 10-year survival probabilities
+
+cindex <- survConcordance(y ~ pred)

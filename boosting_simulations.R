@@ -1,4 +1,4 @@
-### cansoring rates simulation
+### censoring rates simulation
 
 # packages
 
@@ -8,7 +8,11 @@ library(survival)
 library(xgboost)
 install.packages("pacman")
 pacman::p_load_gh("IyarLin/survXgboost")
+library(dynpred)
 library(pec)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("survcomp")
 
 # generate data
 
@@ -64,10 +68,12 @@ xgb.pred <- lapply(c(1,2,3,4,5), function(x) {
 # c-index
 
 surv <- lapply(c(1,2,3,4,5), function(x) {
-  attach(cens_test[[x]])
-  Surv(y, failed)
+  Surv(cens_test[[x]]$y, cens_test[[x]]$failed)
 })
 
 cindex <- lapply(c(1,2,3,4,5), function(x) {
   survConcordance(surv[[x]] ~ xgb.pred[[x]]) 
 })
+
+# c-index with dynpred package
+

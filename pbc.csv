@@ -1,5 +1,4 @@
 id;time;status;trt;age;sex;ascites;hepato;spiders;edema;bili;chol;albumin;copper;alk.phos;ast;trig;platelet;protime;stage
-<<<<<<< HEAD
 1;400;2;D-penicillmain;58,7652293;female;yes;yes;yes;edema;14,5;261;2,6;156;1718;137,95;172;190;12,2;IV
 2;4500;0;D-penicillmain;56,44626968;female;no;yes;yes;no;1,1;302;4,14;54;7394,8;113,52;88;221;10,6;III
 3;1012;2;D-penicillmain;70,07255305;male;no;no;no;untreated;1,4;176;3,48;210;516;96,1;55;151;12;IV
@@ -417,4 +416,3 @@ id;time;status;trt;age;sex;ascites;hepato;spiders;edema;bili;chol;albumin;copper
 416;1055;0;Not randomized;56,99931554;female;NA;NA;NA;no;1,6;NA;3,42;NA;NA;NA;NA;143;9,9;III
 417;691;0;Not randomized;58,00136893;female;NA;NA;NA;no;0,8;NA;3,75;NA;NA;NA;NA;269;10,4;III
 418;976;0;Not randomized;52,99931554;female;NA;NA;NA;no;0,7;NA;3,29;NA;NA;NA;NA;350;10,6;IV
-=======

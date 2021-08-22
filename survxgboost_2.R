@@ -7,26 +7,40 @@ library(xgboost)
 ### data
 
 data(pbc, package = "randomForestSRC")
-pbc <- pbc[complete.cases(pbc), ] # doesn't handle missing values at the moment
-label <- ifelse(pbc$status == 0, -pbc$days, pbc$days)
+pbc <- pbc[complete.cases(pbc),]
+
+# split 
 
 set.seed(1998)
+index <- sample(1:276, size = trunc(.8 * 276)) # 80:20 train-test split
+pbc_train <- pbc %>%
+  filter(row_number() %in% index)
+pbc_test <- pbc %>%
+  filter(!(row_number() %in% index))
 
-val_ind <- sample.int(nrow(pbc), 0.1 * nrow(pbc))
-x_train <- as.matrix(pbc[-val_ind, !names(pbc) %in% c("days", "status")])
-x_label <- label[-val_ind]
-x_val <- xgb.DMatrix(as.matrix(pbc[val_ind, !names(pbc) %in% c("days", "status")]),
-                     label = label[val_ind])
+# create survival label (y) for training
+y_train <- ifelse(pbc_train$status == 1, pbc_train$days, -pbc_train$days) # equivalent to surv object
 
-# train surv_xgboost
+# create predictors (X) for training
+X_train <- pbc_train %>% select(-days,-status)
+X_train <- as.matrix(X_train)
+
+# create survival label (y) for testing
+y_test <- ifelse(pbc_test$status == 1, pbc_test$days, -pbc_test$days) # equivalent to surv object
+
+# create predictors (X) for testing
+X_test <- pbc_test %>% select(-days,-status)
+X_test <- as.matrix(X_test)
+
+### train surv_xgboost
+
 surv_xgboost_model <- xgb.train.surv(
   params = list(
     objective = "survival:cox",
     eval_metric = "cox-nloglik",
     eta = 0.05 # larger eta leads to algorithm not converging, resulting in NaN predictions
-  ), data = x_train, label = x_label,
-  watchlist = list(val2 = x_val),
-  nrounds = 1000, early_stopping_rounds = 30
+  ), data = X_train, label = y_train,
+  nrounds = 1000
 )
 
 ### predict 

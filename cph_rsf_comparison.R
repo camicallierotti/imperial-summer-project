@@ -58,7 +58,7 @@ lapply(c(20,46,43), function(x) {
 # predicted survival curves for 3 individuals
 
 m <- matrix(c(1,2,3,4,4,4),nrow = 2,ncol = 3,byrow = TRUE)
-layout(mat = m,heights = c(0.4,0.2))
+layout(mat = m,height0s = c(0.4,0.2))
 
 lapply(c(20,46,43), function(x) {
   plotPredictSurvProb(cox.fit, newdata = pbc_test[x, ], lty = 1, legend = TRUE, percent = TRUE) 

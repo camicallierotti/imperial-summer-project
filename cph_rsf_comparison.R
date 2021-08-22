@@ -63,7 +63,7 @@ layout(mat = m,heights = c(0.4,0.2))
 lapply(c(20,46,43), function(x) {
   plotPredictSurvProb(cox.fit, newdata = pbc_test[x, ], lty = 1, legend = TRUE, percent = TRUE) 
   plotPredictSurvProb(rsf.fit, newdata = pbc_test[x, ], add = TRUE, lty = 2, legend = TRUE, percent = TRUE)
-}) # predicted survival curves with Cox for 3 test individuals of different ages
+}) 
 
 plot(1, type = "n", axes=FALSE, xlab="", ylab="")
 legend(x = "bottom",inset = 0,

@@ -87,5 +87,6 @@ c_indices <- c(
   'xgboost' = 1 - rcorr.cens(predict(m4, X_test), y_test)[1]
 )
 
-survcurves = predict(m4, newdata=X_test, times=365.25*c(9,10), type='surv')
-survcurves[c(20,46,43),2]
+survcurves = predict(m4, newdata=X_test, times=365.25*seq(0,10,by=0.5), type='surv')
+plot_dat <- as.data.frame(t(survcurves[c(20,46,43),])) %>% rownames_to_column('times') %>% 
+  mutate(times = as.numeric(times)/365.25)

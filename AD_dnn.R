@@ -1,8 +1,8 @@
 library(pacman)
 p_load(
   tidyverse,
+  survival,
   mlr3,
-  
   mlr3proba,
   mlr3tuning,
   mlr3pipelines,
@@ -103,11 +103,37 @@ bl <- learners[[2]]$predict(pbc_task2)
 # msrs <- msrs(c("surv.cindex"))
 # bm$aggregate(msrs)[,c(3,4,7)]
 
+set_seed(3004)
 mod <- deepsurv(Surv(days, status)~., data = pbc_train)
-pred_probs=predict(mod, newdata = pbc_test, type='survival')
-pred_probs = as.data.frame(t(pred_probs)) %>% rownames_to_column('times') %>% 
-  mutate(times = as.numeric(times))
-pred_probs[,c(1,20,46,43)]
+pred_probs_dsurv=predict(mod, newdata = pbc_test, type='survival')
+as.data.frame(t(pred_probs_dsurv)) %>% rownames_to_column('times') %>% 
+  mutate(times = as.numeric(times)) %>% 
+  select(times, `19`,`45`,`42`) %>% 
+  slice(1:(n()-1)) %>% 
+  pivot_longer(cols = -c(times), names_to  = 'Patient', values_to = "Probs") %>% 
+  ggplot(aes( x = times, y = Probs, color=Patient))+
+  geom_line() +
+  scale_y_continuous('Survival Probability', limits = c(0,1))+
+  scale_x_continuous('Days')+
+  theme_bw()
+
+set_seed(3004)
+mod <- deephit(Surv(days, status) ~ ., data=pbc_train,
+               activation ='relu', num_nodes=c(4L, 8L, 4L, 2L), 
+               early_stopping=TRUE, epochs=100L)
+pred_probs_dhit <- predict(mod, newdata = pbc_test, type='survival')
+as.data.frame(t(pred_probs_dhit)) %>% rownames_to_column('times') %>% 
+  mutate(times = as.numeric(times)) %>% 
+  select(times, `19`,`45`,`42`) %>% 
+  slice(1:(n()-1)) %>% 
+  pivot_longer(cols = -c(times), names_to  = 'Patient', values_to = "Probs") %>% 
+  ggplot(aes( x = times, y = Probs, color=Patient))+
+  geom_line() +
+  scale_y_continuous('Survival Probability', limits = c(0,1))+
+  scale_x_continuous('Days')+
+  theme_bw()
+
+save(pred_probs_dsurv, pred_probs_dhit, file = 'dnn_pred.rda', compress=T)
 
 approx(pred_probs$times, pred_probs[,21], 365.25*10)
 approx(pred_probs$times, pred_probs[,47], 365.25*10)

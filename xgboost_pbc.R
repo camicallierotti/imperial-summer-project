@@ -2,7 +2,7 @@
 
 library(dplyr)
 library(xgboost)
-
+library(survXgboost)
 ### data
 
 data(pbc, package = "randomForestSRC")

@@ -58,12 +58,12 @@ lapply(c(20,46,43), function(x) {
 # predicted survival curves for 3 individuals
 
 m <- matrix(c(1,2,3,4,4,4),nrow = 2,ncol = 3,byrow = TRUE)
-layout(mat = m,height0s = c(0.4,0.2))
+layout(mat = m,heights = c(0.4,0.2))
 
 lapply(c(20,46,43), function(x) {
   plotPredictSurvProb(cox.fit, newdata = pbc_test[x, ], lty = 1, legend = TRUE, percent = TRUE) 
   plotPredictSurvProb(rsf.fit, newdata = pbc_test[x, ], add = TRUE, lty = 2, legend = TRUE, percent = TRUE)
-}) 
+})
 
 plot(1, type = "n", axes=FALSE, xlab="", ylab="")
 legend(x = "bottom",inset = 0,
@@ -71,7 +71,7 @@ legend(x = "bottom",inset = 0,
 
 # concordance index
 
-concordance(cox.fit, newdata = pbc_test) # concordance function cannot be applied to rsf
+concordance(cox.fit, newdata = pbc_test, timewt='n') # concordance function cannot be applied to rsf
 rsf.pred <- predict(rsf.fit, newdata = pbc_test, importance = 'permute', cse = TRUE) # can also make predictions for RSF using predict.rfsrc from randomForestSRC package
 
 ### compare lasso cox and rsf vimp
@@ -97,7 +97,8 @@ xtable(cox.coef.table, type = "latex")
 cox.vimp <- anova(cox.fit)
 plot(cox.vimp,
      what="proportion R2", # proportion of overall model R2 that is due to each predictor
-     xlab=NULL, pch=16,
+     #xlab=NULL, 
+     pch=16,
      rm.totals=TRUE, rm.ia=FALSE, rm.other=NULL,
      sort="descending", margin='P',
      pl=TRUE, trans=NULL, ntrans=40, height=NULL, width=NULL)
